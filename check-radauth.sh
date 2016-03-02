@@ -3,10 +3,11 @@
 # Show help function
 function show_help {
     cat <<EOF
-Usage: check-radauth -u testuser -p testpass -r server[:port] -s radius_secret [-n nas_port] -c
+Usage: check-radauth [-t type] -u testuser -p testpass -r server[:port] -s radius_secret [-n nas_port] -c
 
     -h - show this help
-    -c - critical instead of warn
+    -c - CRITICAL instead of WARNING
+    type - one of pap/chap/mschap/eap-md5 (mschap by default)
     testuser/testpass - testing credentials
     server[:port] - address and port of radius server
     radius_secret - radius secret
@@ -17,6 +18,7 @@ EOF
 }
 
 # Default values
+TYPE="mschap"
 USER=""
 PASSWORD=""
 SERVER=""
@@ -37,6 +39,8 @@ while getopts "h?u:p:r:s:n" opt; do
         ;;
     c)  ERROR_STRING="CRITICAL"
         ERROR_STATUS="2"
+        ;;
+    t)  TYPE=$OPTARG
         ;;
     u)  USER=$OPTARG
         ;;
@@ -60,7 +64,7 @@ if [ ! -x $RADTEST ]; then
     exit 3;
 fi;
 
-RESULT=`$RADTEST $USER $PASSWORD $SERVER $NAS_PORT $SECRET 2>&1 | grep -E -o 'Access-Accept|Access-Reject|radclient:.*'`
+RESULT=`$RADTEST -t $TYPE $USER $PASSWORD $SERVER $NAS_PORT $SECRET 2>&1 | grep -E -o 'Access-Accept|Access-Reject|radclient:.*'`
 
 case $RESULT in
 Access-Accept)
