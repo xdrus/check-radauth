@@ -31,7 +31,7 @@ ERROR_STATUS="1"
 
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
-while getopts "h?u:p:r:s:n" opt; do
+while getopts "h?ct:u:p:r:s:n" opt; do
     case "$opt" in
     h|\?)
         show_help
